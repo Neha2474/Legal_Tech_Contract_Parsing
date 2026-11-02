@@ -101,9 +101,10 @@ DATABASES = {
 
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgresql://postgres:admin1234@localhost:5432/legaltech"
+        conn_max_age=600
     )
 }
+
 
 
 # Password validation
