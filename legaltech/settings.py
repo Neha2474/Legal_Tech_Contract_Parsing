@@ -1,3 +1,5 @@
+import os
+import dj_database_url
 """
 Django settings for legaltech project.
 
@@ -20,11 +22,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ht2msl-kj67dr-(dx1x&70)1zl_kwyybin^w3$gr_)zl&*pm9t'
+#SECRET_KEY = 'django-insecure-ht2msl-kj67dr-(dx1x&70)1zl_kwyybin^w3$gr_)zl&*pm9t'
+#SECRET_KEY = os.getenv("SECRET_KEY")
+
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-ht2msl-kj67dr-(dx1x&70)1zl_kwyybin^w3$gr_)zl&*pm9t"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 
+DEBUG = os.getenv("DEBUG", "False") == "True"
+DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
@@ -77,7 +86,7 @@ WSGI_APPLICATION = 'legaltech.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
+"""
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
@@ -88,6 +97,12 @@ DATABASES = {
         "PORT": "5432",
 
     }
+}"""
+
+DATABASES = {
+    "default": dj_database_url.config(
+        default="postgresql://postgres:admin1234@localhost:5432/legaltech"
+    )
 }
 
 
@@ -140,3 +155,5 @@ STORAGES = {
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
