@@ -1,0 +1,337 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LegalTech</title>
+
+    <link rel="icon" href="{% static 'images/legaltech.png' %}">
+    <link rel="stylesheet" href="{% static 'css/legal_style.css' %}">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="dashboard-header">
+        <h1>LEGALTECH</h1>
+        <p>Automated Contract Parsing & Risk Extraction Engine</p>
+    </header>
+
+
+    <!-- ================= UPLOAD ================= -->
+
+    <section class="upload-section">
+
+        <h2>Upload Contract</h2>
+
+        <form method="POST"
+              enctype="multipart/form-data"
+              id="uploadForm">
+
+            {% csrf_token %}
+
+            <label>Contract Title</label>
+
+            <input type="text"
+                   name="title"
+                   placeholder="Enter contract title"
+                   required>
+
+
+            <label>Select PDF File</label>
+
+            <input type="file"
+                   name="file"
+                   accept=".pdf"
+                   required>
+
+
+            <button type="submit"
+                    id="uploadButton">
+                Analyze Contract
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- ================= MESSAGE ================= -->
+
+    {% if message %}
+
+        <div class="message-box">
+            {{ message }}
+        </div>
+
+    {% endif %}
+
+
+    <!-- ================= SUMMARY ================= -->
+
+    {% if summary %}
+
+        <section class="summary-section">
+
+            <h2>Document Summary</h2>
+
+            <div class="content-card">
+                <pre>{{ summary }}</pre>
+            </div>
+
+        </section>
+
+    {% endif %}
+
+
+    <!-- ================= CONTRACT INFORMATION ================= -->
+
+    {% if contract_info %}
+
+        <section class="contract-info">
+
+            <h2>Contract Information</h2>
+
+            <div class="contract-info-grid">
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Governing Law
+                    </span>
+
+                    <span class="info-value">
+                        {{ contract_info.governing_law|default:"Not detected" }}
+                    </span>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Jurisdiction
+                    </span>
+
+                    <span class="info-value">
+                        {{ contract_info.jurisdiction|default:"Not detected" }}
+                    </span>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Contract Duration
+                    </span>
+
+                    <span class="info-value">
+                        {{ contract_info.duration|default:"Not detected" }}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+
+    <!-- ================= RISK SUMMARY ================= -->
+
+    {% if risk_summary %}
+
+        <section class="risk-summary">
+
+            <h2>Risk Summary</h2>
+
+            <div class="summary-box">
+
+                <div class="summary-card total">
+
+                    <h3>
+                        {{ risk_summary.total }}
+                    </h3>
+
+                    <p>Total Risks</p>
+
+                </div>
+
+
+                <div class="summary-card high">
+
+                    <h3>
+                        {{ risk_summary.high }}
+                    </h3>
+
+                    <p>High Risk</p>
+
+                </div>
+
+
+                <div class="summary-card medium">
+
+                    <h3>
+                        {{ risk_summary.medium }}
+                    </h3>
+
+                    <p>Medium Risk</p>
+
+                </div>
+
+
+                <div class="summary-card low">
+
+                    <h3>
+                        {{ risk_summary.low }}
+                    </h3>
+
+                    <p>Low Risk</p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+
+    <!-- ================= RISK SCORE ================= -->
+
+    {% if risk_score %}
+
+        <section class="risk-score">
+
+            <h2>Overall Contract Risk Score</h2>
+
+            <div class="score-card">
+
+                <div class="score-number">
+
+                    {{ risk_score.score }}
+
+                    <span>/ 100</span>
+
+                </div>
+
+
+                <div class="score-level {{ risk_score.level|lower }}">
+
+                    {{ risk_score.level }} Risk
+
+                </div>
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+
+    <!-- ================= RISK ANALYSIS ================= -->
+
+    {% if risks %}
+
+        <section class="risk-analysis">
+
+            <h2>Risk Analysis</h2>
+
+            <div class="risk-list">
+
+                {% for risk in risks %}
+
+                    <div class="risk-item">
+
+                        <div class="risk-header">
+
+                            <span class="risk-badge {{ risk.risk|lower }}">
+                                {{ risk.risk }} Risk
+                            </span>
+
+                            <span class="risk-keyword">
+                                {{ risk.keyword }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="risk-detail">
+
+                            <strong>Reason:</strong>
+
+                            <p>
+                                {{ risk.reason }}
+                            </p>
+
+                        </div>
+
+
+                        <div class="risk-detail">
+
+                            <strong>Risky Clause:</strong>
+
+                            <p class="clause">
+                                "{{ risk.highlighted_clause }}"
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+
+    <!-- ================= EXTRACTED TEXT ================= -->
+
+    {% if extracted_text %}
+
+        <section class="extracted-section">
+
+            <h2>Extracted Text</h2>
+
+            <div class="content-card">
+
+                <pre>{{ extracted_text }}</pre>
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+</div>
+
+
+
+<script>
+
+    const form = document.getElementById("uploadForm");
+    const button = document.getElementById("uploadButton");
+
+    form.addEventListener("submit", function () {
+
+        button.disabled = true;
+        button.innerText = "Analyzing Contract...";
+
+    });
+
+</script>
+
+</body>
+
+</html>
